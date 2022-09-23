@@ -1,0 +1,29 @@
+{
+  "name": "contact-app-api",
+  "version": "1.0.0",
+  "description": "A contact listing application duly protected with JWT authentication.",
+  "main": "server.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mdazlaanzubair/Contact-App-API.git"
+  },
+  "keywords": [
+    "mongoDB",
+    "node",
+    "express",
+    "JWT",
+    "javascript",
+    "authentication",
+    "open",
+    "source"
+  ],
+  "author": "Muhammad Azlaan Zubair",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mdazlaanzubair/Contact-App-API/issues"
+  },
+  "homepage": "https://github.com/mdazlaanzubair/Contact-App-API#readme"
+}
