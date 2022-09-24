@@ -1,7 +1,7 @@
 import User from "../../models/User.mjs";
 
 //  function that checks if user already exists or otherwise
-const existingUser = async (email) => {
+export const existingUser = async (email) => {
   // try/catch block for db action
   try {
     // user_exist = null if user not found
@@ -43,28 +43,18 @@ export const validator = async (fname, lname, email, password) => {
 
   // validating email
   if (email !== undefined) {
-    if (email.length == 0)
+    if (email.length <= 0) {
       return (error = "User cannot register without email.");
+    } else {
+      // regex for validating email
+      const email_regex =
+        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    // regex for validating email
-    const email_regex =
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-    // checking if email is valid or otherwise
-    if (!email.match(email_regex))
-      return (error = "Please enter a valid email.");
-
-    // checking if this email already registered or otherwise
-    if (email.length > 0) {
-      // checking if user already exist or otherwise
-      const isUserExist = await existingUser(email);
-
-      // return error if user exists else return false
-      isUserExist === null
-        ? (error = false)
-        : (error = "Email is already registered.");
-
-      return error;
+      // checking if email is valid or otherwise
+      if (!email.match(email_regex))
+        return (error = "Please enter a valid email.");
     }
   }
+
+  return error;
 };
