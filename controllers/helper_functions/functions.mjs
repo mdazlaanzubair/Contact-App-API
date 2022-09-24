@@ -1,4 +1,7 @@
 import User from "../../models/User.mjs";
+import global_ENV from "dotenv";
+global_ENV.config();
+import jwt from "jsonwebtoken";
 
 //  function that checks if user already exists or otherwise
 export const existingUser = async (email) => {
@@ -58,3 +61,9 @@ export const validator = async (fname, lname, email, password) => {
 
   return error;
 };
+
+// JWT tokens generator
+export const user_jwt = () => {
+  const secret_key = process.env.JWT_SECRET_KEY
+  const token = jwt.sign
+}
