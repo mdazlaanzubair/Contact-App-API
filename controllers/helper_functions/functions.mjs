@@ -1,0 +1,70 @@
+import User from "../../models/User.mjs";
+
+//  function that checks if user already exists or otherwise
+const existingUser = async (email) => {
+  // try/catch block for db action
+  try {
+    // user_exist = null if user not found
+    const user_exist = await User.findOne({ email }).exec();
+
+    // stopping script from running further
+    return user_exist;
+  } catch (error) {
+    return error;
+  }
+};
+
+// validate signup form
+export const validator = async (fname, lname, email, password) => {
+  let error = false;
+
+  // validating fname
+  if (fname !== undefined) {
+    if (fname.length < 3)
+      return (error = "First Name must be at least 3 characters long.");
+
+    if (fname.length >= 30)
+      return (error = "First Name must not be longer than 30 characters.");
+  }
+
+  // validating lname
+  if (lname !== undefined) {
+    if (lname.length < 3)
+      return (error = "Last Name must be at least 3 characters long.");
+    if (lname.length >= 30)
+      return (error = "Last Name must not be longer than 30 characters.");
+  }
+
+  // validating password
+  if (password !== undefined) {
+    if (password.length <= 6)
+      return (error = "Password must be at least 6 characters long.");
+  }
+
+  // validating email
+  if (email !== undefined) {
+    if (email.length == 0)
+      return (error = "User cannot register without email.");
+
+    // regex for validating email
+    const email_regex =
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    // checking if email is valid or otherwise
+    if (!email.match(email_regex))
+      return (error = "Please enter a valid email.");
+
+    // checking if this email already registered or otherwise
+    if (email.length > 0) {
+      // checking if user already exist or otherwise
+      const isUserExist = await existingUser(email);
+
+      // return error if user exists else return false
+      isUserExist === null
+        ? (error = false)
+        : (error = "Email is already registered.");
+
+      return error;
+    }
+  }
+};

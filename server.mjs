@@ -3,6 +3,9 @@ import express from "express";
 import db_isConnected from "./db_connection/db_config.mjs";
 import cors from "cors";
 
+// routes import
+import userRoutes from "./routes/usersRoutes.mjs";
+
 // express app initialization
 const app = express();
 
@@ -27,8 +30,9 @@ db_isConnected.then((status) => {
 // middleware(s)
 app.use(express.json());
 app.use(cors());
+app.use("/api/user", userRoutes);
 
 // sending response to the client
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.send(`Hi there! Contact Lists Server listening on port ${port}`);
 });
