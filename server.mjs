@@ -7,7 +7,7 @@ import cors from "cors";
 const app = express();
 
 // setting port for the server to run on
-const port = process.env.PORT || process.env.LOCAL_PORT;
+const port = process.env.PORT || 3000;
 
 // checking db connection
 db_isConnected.then((status) => {
