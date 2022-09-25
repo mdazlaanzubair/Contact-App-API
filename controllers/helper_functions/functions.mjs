@@ -3,6 +3,9 @@ import global_ENV from "dotenv";
 global_ENV.config();
 import jwt from "jsonwebtoken";
 
+// grabbing secret key from the env file
+const secret_key = process.env.JWT_SECRET_KEY;
+
 //  function that checks if user already exists or otherwise
 export const existingUser = async (email) => {
   // try/catch block for db action
@@ -18,7 +21,16 @@ export const existingUser = async (email) => {
 };
 
 // validate signup form
-export const validator = async (fname, lname, email, password) => {
+export const validator = async (
+  fname,
+  lname,
+  email,
+  password,
+  token,
+  gender,
+  bio,
+  contact
+) => {
   let error = false;
 
   // validating fname
@@ -59,11 +71,55 @@ export const validator = async (fname, lname, email, password) => {
     }
   }
 
+  // validating token
+  if (token !== undefined) {
+    if (lname.length < 0)
+      return (error = "Last Name must be at least 3 characters long.");
+  }
+
+  // validating gender
+  if (gender !== undefined) {
+    if (isNaN(gender) || parseInt(gender) < 0 || parseInt(gender) > 2)
+      return (error = "Invalid gender, please select right gender.");
+  }
+
+  // validating bio
+  if (bio !== undefined) {
+    if (bio.length < 30)
+      return (error = "Bio must be at least 30 characters long.");
+    if (bio.length >= 200)
+      return (error = "Bio must not be longer than 200 characters.");
+  }
+
+  // validating contact
+  if (contact !== undefined) {
+    // regex for validating contact
+    const contact_regex =
+      /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+
+    // checking if contact is valid or otherwise
+    if (contact.match(contact_regex)) return (error = "Invalid phone number.");
+  }
+
   return error;
 };
 
-// JWT tokens generator
-export const user_jwt = () => {
-  const secret_key = process.env.JWT_SECRET_KEY
-  const token = jwt.sign
-}
+// JWT tokens generator function
+export const issue_jwt = (user) => {
+  // generating token
+  const token = jwt.sign({ id: user._id }, secret_key, { expiresIn: "2d" });
+
+  // returning token
+  return token;
+};
+
+// function to verify JWT tokens
+export const verify_jwt = (token) => {
+  return jwt.verify(token, secret_key, (err, userID) => {
+    if (err) {
+      return err.message;
+    } else {
+      return userID;
+    }
+  });
+};

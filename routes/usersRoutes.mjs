@@ -1,21 +1,21 @@
 import express from "express";
 import {
-  list_users,
-  add_user,
-  show_user,
-  edit_user,
-  delete_user,
+  index,
+  create,
+  view,
+  update,
+  destroy,
 } from "../controllers/usersController.mjs";
 
 // invoking express router
 const router = express.Router();
 
 // routes to user controller
-router.get("/index", list_users);
-router.post("/create", add_user);
-router.get("/view/:id", show_user);
-router.put("/edit/:id", edit_user);
-router.delete("/delete/:id", delete_user);
+router.get("/index", index);
+router.post("/create", create);
+router.get("/view/", view);
+router.put("/update/", update);
+router.delete("/delete/", destroy);
 
 // exporting router
 export default router;

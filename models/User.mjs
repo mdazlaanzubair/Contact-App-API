@@ -47,8 +47,10 @@ var userSchema = new Schema(
       maxLength: [30, "Last Name must not be longer than 30 characters."],
     },
     gender: {
-      type: String,
-      default: "Private",
+      type: Number,
+      min: [0, "Invalid input"],
+      max: [2, "Invalid input"],
+      default: 0,
     },
     bio: {
       type: String,

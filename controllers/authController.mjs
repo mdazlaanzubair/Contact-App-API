@@ -1,6 +1,6 @@
 import User from "../models/User.mjs";
 import bcrypt from "bcryptjs";
-import { validator } from "./helper_functions/functions.mjs";
+import { validator, issue_jwt } from "./helper_functions/functions.mjs";
 
 // function to login the user
 export const login = async (req, res) => {
@@ -8,7 +8,7 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   // validating input before saving to the database
-  const isError = await validator(undefined, undefined, email, password);
+  const isError = await validator(email, password);
   if (isError === false) {
     // try/catch block for performing database action
     try {
@@ -24,11 +24,12 @@ export const login = async (req, res) => {
         // sending success response to the client
         res.status(200).send({
           user,
+          jwt_token: issue_jwt(user),
           message: "User is successfully logged in.",
         });
       } else {
         // sending errors in response
-        res.status(400).send("Incorrect credentials.");
+        res.status(400).send({ message: "Incorrect credentials." });
       }
     } catch (error) {
       // logging error in the server logs
@@ -37,12 +38,12 @@ export const login = async (req, res) => {
       // sending error to the client
       res.status(500).send({
         error,
-        message: "An error occurred while saving user in the data.",
+        message: "Internal Server Error.",
       });
     }
   } else {
     // sending errors in response
-    res.status(400).send(isError);
+    res.status(400).send({ message: isError });
   }
 
   // stopping script from running further
@@ -51,5 +52,5 @@ export const login = async (req, res) => {
 
 // function to login the user after registering to the database
 export const signup = async (req, res) => {
-  res.send("Signup")
+  res.send({ message: "Signup" });
 };
