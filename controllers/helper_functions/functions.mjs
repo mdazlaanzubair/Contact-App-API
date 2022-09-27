@@ -21,7 +21,7 @@ export const existingUser = async (email) => {
 };
 
 // validate signup form
-export const validator = async (
+export const validator = async ({
   fname,
   lname,
   email,
@@ -29,8 +29,8 @@ export const validator = async (
   token,
   gender,
   bio,
-  contact
-) => {
+  contact,
+}) => {
   let error = false;
 
   // validating fname
@@ -98,7 +98,9 @@ export const validator = async (
       /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
 
     // checking if contact is valid or otherwise
-    if (contact.match(contact_regex)) return (error = "Invalid phone number.");
+    if (contact.match(contact_regex)) {
+      return error = "Invalid phone number.";
+    }
   }
 
   return error;

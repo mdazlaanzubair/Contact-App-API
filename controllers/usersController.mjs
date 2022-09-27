@@ -7,8 +7,33 @@ import {
   verify_jwt,
 } from "./helper_functions/functions.mjs";
 
-export const index = (req, res) => {
-  res.send({ message: "List of registered users." });
+export const index = async (req, res) => {
+  // fetch information and send to the client
+  try {
+    const users = await User.find({ isDeleted: false }, "-password");
+
+    // if user not found - return Error - 404
+    if (!users|| users.length <= 0)
+      res.status(404).send({
+        message: "No user exists in the database.",
+      });
+
+    // if user found - return user information
+    if (users) {
+      res
+        .status(200)
+        .send({ users, message: "List of users is successfully fetched." });
+    }
+  } catch (error) {
+    // logging error in the server logs
+    console.log(error);
+
+    // sending error to the client
+    res.status(500).send({
+      error,
+      message: "Internal Server Error.",
+    });
+  }
 
   // stopping script from running further
   return;
@@ -24,7 +49,7 @@ export const create = async (req, res) => {
   }+${lname}&&background=random`;
 
   // validating input before saving to the database
-  const isError = await validator(fname, lname, email, password);
+  const isError = await validator({ fname, lname, email, password });
 
   // if validator throws error
   if (isError) res.status(400).send({ message: isError });
@@ -85,7 +110,7 @@ export const view = async (req, res) => {
 
   // if token does not verified - return unauthorized response
   if (isVerified === "invalid token")
-    res.statue(401).send({
+    res.status(401).send({
       message: "Invalid token, please login.",
     });
 
@@ -93,11 +118,14 @@ export const view = async (req, res) => {
   if (isVerified !== "invalid token") {
     // fetch information and send to the client
     try {
-      const user = await User.findById(isVerified.id, "-password");
+      const user = await User.find(
+        { _id: isVerified.id, isDeleted: false },
+        "-password"
+      ).exec();
 
       // if user not found - return Error - 404
-      if (!user)
-        res.statue(404).send({
+      if (!user || user.length <= 0)
+        res.status(404).send({
           message: "User does not exist.",
         });
 
@@ -130,7 +158,7 @@ export const update = async (req, res) => {
 
   // if token does not verified - return unauthorized response
   if (isVerified === "invalid token")
-    res.statue(401).send({
+    res.status(401).send({
       message: "Invalid token, please login.",
     });
 
@@ -138,23 +166,31 @@ export const update = async (req, res) => {
   const { fname, lname, email, gender, bio, contact } = req.body;
 
   // validating input before saving to the database
-  const isError = await validator(fname, lname, email, gender, bio, contact);
+  const isError = await validator({
+    fname,
+    lname,
+    email,
+    gender,
+    bio,
+    contact,
+  });
 
   // if validator throws error
   if (isError) res.status(400).send({ message: isError });
 
   // if validator throws no-error - false
   if (isVerified !== "invalid token" && !isError) {
-    // fetch information and send to the client
+    // fetch information and send to the client after updating
     try {
       const user = await User.findByIdAndUpdate(
-        { _id: isVerified.id },
-        req.body // whole req.body is replaced with the db object
+        { _id: isVerified.id }, // finding document in the database that matches the condition
+        { fname, lname, email, gender, bio, contact }, // updating record in the database using es6 object destructuring method
+        { new: true } // it is to return updated user data
       );
 
       // if user not found - return Error - 404
-      if (!user)
-        res.statue(404).send({
+      if (!user || user.length <= 0)
+        res.status(404).send({
           message: "User does not exist.",
         });
 
@@ -180,8 +216,44 @@ export const update = async (req, res) => {
   return;
 };
 
-export const destroy = (req, res) => {
-  res.send({ message: "Delete user." });
+export const destroy = async (req, res) => {
+  // getting jwt from the request and verifying it
+  const token = req.headers.authorization.split(" ")[1];
+  const isVerified = verify_jwt(token);
+
+  // if token does not verified - return unauthorized response
+  if (isVerified === "invalid token")
+    res.status(401).send({
+      message: "Invalid token, please login.",
+    });
+
+  // fetch information and deleting
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: isVerified.id, isDeleted: false }, // finding document in the database that matches the condition
+      { isDeleted: true } // deleting user
+    );
+
+    // if user not found - return Error - 404
+    if (!user || user.length <= 0)
+      res.status(404).send({
+        message: "User does not exist.",
+      });
+
+    // if user found - return user information
+    if (user) {
+      res.status(200).send({ message: "User data successfully deleted." });
+    }
+  } catch (error) {
+    // logging error in the server logs
+    console.log(error);
+
+    // sending error to the client
+    res.status(500).send({
+      error,
+      message: "Internal Server Error.",
+    });
+  }
 
   // stopping script from running further
   return;
