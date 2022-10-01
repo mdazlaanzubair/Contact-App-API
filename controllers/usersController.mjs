@@ -13,7 +13,7 @@ export const index = async (req, res) => {
     const users = await User.find({ isDeleted: false }, "-password");
 
     // if user not found - return Error - 404
-    if (!users|| users.length <= 0)
+    if (!users || users.length <= 0)
       res.status(404).send({
         message: "No user exists in the database.",
       });
@@ -71,6 +71,7 @@ export const create = async (req, res) => {
         fname,
         lname,
         avatar,
+        gender: 0,
         password: bcrypt.hashSync(password),
         username: `user_${new Date().valueOf()}`,
       });
