@@ -13,7 +13,8 @@ export const index = async (req, res) => {
     );
 
     // if no contact send this response
-    if (!contacts) return res.status(204).send({ success_msg: "No contacts." });
+    if (!contacts || contacts.length === 0)
+      return res.status(204).send({ success_msg: "No contacts." });
 
     // if contact send this response
     return res.status(200).send({ contacts, success_msg: "Your contacts." });
@@ -28,7 +29,8 @@ export const index = async (req, res) => {
 export const create = async (req, res) => {
   // validate request body coming from client
   const errors = contactValidator(req.body);
-  if (!errors) return res.status(400).send({ err_msg: errors });
+  if (!errors || Object.keys(errors).length === 0)
+    return res.status(400).send({ err_msg: errors });
 
   // if contact already exist
   const isExist = await alreadyExist(req.body.contact);
@@ -63,7 +65,7 @@ export const view = async (req, res) => {
   try {
     // checking if database has the requested contact
     const contact = await Contact.findById(req.params.id);
-    if (!contact)
+    if (!contact || Object.keys(contact).length === 0)
       return res.status(404).send({ err_msg: "Contact doesn't exist." });
 
     // if contact exist send it to the client
@@ -85,7 +87,8 @@ export const update = async (req, res) => {
 
   // validate request body coming from client
   const errors = contactValidator(req.body);
-  if (!errors) return res.status(400).send({ err_msg: errors });
+  if (!errors || Object.keys(errors).length === 0)
+    return res.status(400).send({ err_msg: errors });
 
   // updating the contact document in mongoDB
   try {
@@ -97,7 +100,7 @@ export const update = async (req, res) => {
     );
 
     // if requested contact doesn't exist
-    if (!contact)
+    if (!contact || Object.keys(contact).length === 0)
       return res.status(404).send({ err_msg: "Contact doesn't exist." });
 
     // if requested contact exists
@@ -127,7 +130,7 @@ export const destroy = async (req, res) => {
     );
 
     // if requested contact doesn't exist
-    if (!contact)
+    if (!contact || Object.keys(contact).length === 0)
       return res.status(404).send({ err_msg: "Contact doesn't exist." });
 
     // if requested contact exists
