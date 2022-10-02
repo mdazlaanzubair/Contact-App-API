@@ -6,6 +6,7 @@ import cors from "cors";
 // routes import
 import userRoutes from "./routes/usersRoutes.mjs";
 import authRoutes from "./routes/authRoutes.mjs";
+import contactsRoutes from "./routes/contactsRoutes.mjs";
 
 // express app initialization
 const app = express();
@@ -33,6 +34,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/contact", contactsRoutes);
 
 // sending response to the client
 app.get("/api", (req, res) => {
